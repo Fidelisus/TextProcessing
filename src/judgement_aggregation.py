@@ -4,22 +4,20 @@ import scipy.stats as stats
 from operator import itemgetter
 
 class JudgementAggregation:
-    def __init__(self):
+    def __init__(self, main_folder):
         # count of the times that user agreed on the score with someone else
         self.users_trust = {}
         # count of the times that user annotated, given there was also someone else annotating
         # it will be used to normalize users_trust
         self.users_annotations_count = {}
+        self.main_folder = main_folder
         
     def load_data(self):
-        # loading of part 1 data
-        main_folder = "../data/Part-1/"
-
         # paths to relevant datasets
         config_p1 = {
-            "docs": main_folder + "fira-22.documents.tsv",
-            "judgements": main_folder + "fira-22.judgements-anonymized.tsv",
-            "queries": main_folder + "fira-22.queries.tsv",
+            "docs": self.main_folder + "fira-22.documents.tsv",
+            "judgements": self.main_folder + "fira-22.judgements-anonymized.tsv",
+            "queries": self.main_folder + "fira-22.queries.tsv",
         }
 
         # Document text with id
