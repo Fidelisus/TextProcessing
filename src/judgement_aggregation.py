@@ -78,14 +78,14 @@ class JudgementAggregation:
             # a) if users agree
             if user_relevance_dict[users[0]] == user_relevance_dict[users[1]]:
                 df["relevanceLevel"] = user_relevance_dict[users[0]][0]
-                return df
+                return df.iloc[[0]]
             # b if users disagree then we trust one with higher users_trust_normalized
             elif self.users_trust_normalized[users[0]] >= self.users_trust_normalized[users[1]]:
                 df["relevanceLevel"] = user_relevance_dict[users[0]][0]
-                return df
+                return df.iloc[[0]]
             else:
                 df["relevanceLevel"] = user_relevance_dict[users[1]][0]
-                return df
+                return df.iloc[[0]]
         # 2) If there are only two relevances and they are far apart we don't trust it
         elif df.shape[0] == 2 and max_distance_between_relevances > 1.0:
             return df[:0]
@@ -94,7 +94,7 @@ class JudgementAggregation:
             # a) If everyone agrees then it is easy
             if len(set(relevances)) == 1:
                 df["relevanceLevel"] = user_relevance_dict[users[0]][0]
-                return df
+                return df.iloc[[0]]
             # b) If the max distance between scores is ==3 then we don't trust it
             elif max_distance_between_relevances == 3:
                 return df[:0]
@@ -107,10 +107,13 @@ class JudgementAggregation:
                     denominator += self.users_trust_normalized[user]
                 if denominator != 0.0:
                     df["relevanceLevel"] = round(weighted_sum/denominator)
-                    return df
+                    return df.iloc[[0]]
             
     def aggregate(self, file_path=None):
         self.load_data()
+        
+        # Filter judgements 
+        self.judgements_p1 = self.judgements_p1[self.judgements_p1["durationUsedToJudgeMs"] >= 2000]
         
         self.judgements_p1.groupby(["queryId", "documentId"]).apply(self.calculate_user_trust)
 
